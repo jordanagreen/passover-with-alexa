@@ -182,10 +182,81 @@ function onIntent(intentRequest, session, callback) {
         handleFinishSessionRequest(intent, session, callback);
     } else if ("AMAZON.CancelIntent" === intentName) {
         handleFinishSessionRequest(intent, session, callback);
-    } else {
+    } else if ("FirstPlagueQuestionIntent" === intentName) {
+        askFirstPlagueQuestion(intent, session, callback);
+    }
+
+
+    else {
         throw "Invalid intent";
     }
 }
+
+function askFirstPlagueQuestion(intent, session, callback){
+    var speechOutput = "",
+        sessionAttributes = {};
+    var questionIndex = 0;
+    // var question = Object.keys(questions[questionIndex])[0];
+
+    // var question = {
+    //     "What was the first plague?": [
+    //         "Blood",
+    //         "Frogs",
+    //         "Lice",
+    //         "Darkness"
+    //     ]
+    // };
+
+    var answers = [
+            "Blood",
+            "Frogs",
+            "Lice",
+            "Darkness"
+        ];
+
+    var answer,
+        answerIndex;
+    var isTrueOrFalse = true;
+    if (isTrueOrFalse){
+        // var question = Object.keys(questions[questionIndex])[0];
+        var isCorrect = (Math.random()<.5);
+        // var answer = createTrueOrFalseAnswer(questions, questionIndex, isTrue);
+        if (isCorrect){
+            answerIndex = 0;
+        } 
+        else {
+            answerIndex = Math.floor(Math.random() * (answers.length-1)+1);
+            // answer = answers[answerIndex];
+        }
+        answer = answers[answerIndex];
+        speechOutput += "I think it's " + answer + ". Is that right?";
+    }
+    sessionAttributes = {
+        "speechOutput": speechOutput,
+        "repromptText": speechOutput,
+        "isTrueOrFalse": isTrueOrFalse,
+        "isCorrect": isCorrect,
+        "correctAnswerText": answers[0],
+        "questions": questions // just to make it think there's a game
+    };
+
+    var repromptText = speechOutput;
+
+    callback(sessionAttributes,
+        buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+}
+
+// function createTrueOrFalseAnswer(questions, questionIndex, isTrue){
+//     var possibleAnswers = [];
+//     // var question = Object.keys(questions[questionIndex])[0];
+//     if (isTrue){
+//         return questions[questionIndex][0];
+//     } 
+//     else {
+//         var answerIndex = Math.floor(Math.random() * (answers.length-1)+1);
+//         return answers[answerIndex];
+//     }
+// }
 
 /**
  * Called when the user ends the session.
@@ -202,38 +273,39 @@ function onSessionEnded(sessionEndedRequest, session) {
 
 var ANSWER_COUNT = 4;
 var GAME_LENGTH = 5;
-var CARD_TITLE = "Reindeer Games"; // Be sure to change this for your skill.
+var CARD_TITLE = "Passover Trivia"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
     var sessionAttributes = {},
-        speechOutput = "Reindeer Games. I will ask you " + GAME_LENGTH.toString()
-            + " questions, try to get as many right as you can. Just say the number of the answer. Let's begin. ",
-        shouldEndSession = false,
+        speechOutput = "Ask me a question.",
+        repromptText = speechOutput,
+        shouldEndSession = false;
 
-        gameQuestions = populateGameQuestions(),
-        correctAnswerIndex = Math.floor(Math.random() * (ANSWER_COUNT)), // Generate a random index for the correct answer, from 0 to 3
-        roundAnswers = populateRoundAnswers(gameQuestions, 0, correctAnswerIndex),
+        // gameQuestions = populateGameQuestions(),
+        // correctAnswerIndex = Math.floor(Math.random() * (ANSWER_COUNT)), // Generate a random index for the correct answer, from 0 to 3
+        // roundAnswers = populateRoundAnswers(gameQuestions, 0, correctAnswerIndex),
 
-        currentQuestionIndex = 0,
-        spokenQuestion = Object.keys(questions[gameQuestions[currentQuestionIndex]])[0],
-        repromptText = "Question 1. " + spokenQuestion + " ",
+        // currentQuestionIndex = 0,
+        // spokenQuestion = Object.keys(questions[gameQuestions[currentQuestionIndex]])[0],
+        // repromptText = "Question 1. " + spokenQuestion + " ",
 
-        i, j;
+        // i, j;
 
-    for (i = 0; i < ANSWER_COUNT; i++) {
-        repromptText += (i+1).toString() + ". " + roundAnswers[i] + ". "
-    }
-    speechOutput += repromptText;
-    sessionAttributes = {
-        "speechOutput": repromptText,
-        "repromptText": repromptText,
-        "currentQuestionIndex": currentQuestionIndex,
-        "correctAnswerIndex": correctAnswerIndex + 1,
-        "questions": gameQuestions,
-        "score": 0,
-        "correctAnswerText":
-            questions[gameQuestions[currentQuestionIndex]][Object.keys(questions[gameQuestions[currentQuestionIndex]])[0]][0]
-    };
+    // for (i = 0; i < ANSWER_COUNT; i++) {
+    //     repromptText += (i+1).toString() + ". " + roundAnswers[i] + ". "
+    // }
+    // speechOutput += repromptText;
+    // sessionAttributes = {
+        // "speechOutput": repromptText,
+        // "repromptText": repromptText,
+        // "currentQuestionIndex": currentQuestionIndex,
+        // "correctAnswerIndex": correctAnswerIndex + 1,
+        // "questions": gameQuestions,
+        // "score": 0,
+        // "correctAnswerText":
+            // questions[gameQuestions[currentQuestionIndex]][Object.keys(questions[gameQuestions[currentQuestionIndex]])[0]][0]
+    // };
+    sessionAttributes = {};
     callback(sessionAttributes,
         buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, shouldEndSession));
 }
@@ -303,7 +375,15 @@ function handleAnswerRequest(intent, session, callback) {
     var speechOutput = "";
     var sessionAttributes = {};
     var gameInProgress = session.attributes && session.attributes.questions;
-    var answerSlotValid = isAnswerSlotValid(intent);
+    var answerSlotValid;
+    // var answerSlotValid = isAnswerSlotValid(intent);
+    if (session.attributes.isTrueOrFalse){
+        answerSlotValid = (intent.name === "AMAZON.YesIntent" || intent.name === "AMAZON.NoIntent");
+        // answerSlotValid = true;
+    }
+    else{
+        answerSlotValid = false;
+    }
     var userGaveUp = intent.name === "DontKnowIntent";
 
     if (!gameInProgress) {
@@ -317,61 +397,88 @@ function handleAnswerRequest(intent, session, callback) {
         // If the user provided answer isn't a number > 0 and < ANSWER_COUNT,
         // return an error message to the user. Remember to guide the user into providing correct values.
         var reprompt = session.attributes.speechOutput;
-        var speechOutput = "Your answer must be a number between 1 and " + ANSWER_COUNT + ". " + reprompt;
+        var speechOutput;
+        if (session.attributes.isTrueOrFalse){
+            speechOutput = "Your answer needs to be a yes or no. " + reprompt;
+        }
+        else{
+            speechOutput = "Your answer must be a number between 1 and " + ANSWER_COUNT + ". " + reprompt;
+        } 
         callback(session.attributes,
             buildSpeechletResponse(CARD_TITLE, speechOutput, reprompt, false));
     } else {
-        var gameQuestions = session.attributes.questions,
-            correctAnswerIndex = parseInt(session.attributes.correctAnswerIndex),
-            currentScore = parseInt(session.attributes.score),
-            currentQuestionIndex = parseInt(session.attributes.currentQuestionIndex),
-            correctAnswerText = session.attributes.correctAnswerText;
+        if (session.attributes.isTrueOrFalse){
+            var correct = (session.attributes.isCorrect && intent.name === "AMAZON.YesIntent") || 
+                (!(session.attributes.isCorrect) && intent.name === "AMAZON.NoIntent");
 
-        var speechOutputAnalysis = "";
-
-        if (answerSlotValid && parseInt(intent.slots.Answer.value) == correctAnswerIndex) {
-            currentScore++;
-            speechOutputAnalysis = "correct. ";
-        } else {
-            if (!userGaveUp) {
+            var speechOutputAnalysis = "";
+            if (correct){
+                speechOutputAnalysis = "correct. ";
+            }
+            else {
                 speechOutputAnalysis = "wrong. "
             }
-            speechOutputAnalysis += "The correct answer is " + correctAnswerIndex + ": " + correctAnswerText + ". ";
-        }
-        // if currentQuestionIndex is 4, we've reached 5 questions (zero-indexed) and can exit the game session
-        if (currentQuestionIndex == GAME_LENGTH - 1) {
-            speechOutput = userGaveUp ? "" : "That answer is ";
-            speechOutput += speechOutputAnalysis + "You got " + currentScore.toString() + " out of "
-                + GAME_LENGTH.toString() + " questions correct. Thank you for playing!";
+            if (!correct || (correct && !(session.attributes.isCorrect))){
+                speechOutputAnalysis += "The correct answer is: " + session.attributes.correctAnswerText;
+            }
+            speechOutput = speechOutputAnalysis;
             callback(session.attributes,
                 buildSpeechletResponse(CARD_TITLE, speechOutput, "", true));
-        } else {
-            currentQuestionIndex += 1;
-            var spokenQuestion = Object.keys(questions[gameQuestions[currentQuestionIndex]])[0];
-            // Generate a random index for the correct answer, from 0 to 3
-            correctAnswerIndex = Math.floor(Math.random() * (ANSWER_COUNT));
-            var roundAnswers = populateRoundAnswers(gameQuestions, currentQuestionIndex, correctAnswerIndex),
+        }
+        else {
 
-                questionIndexForSpeech = currentQuestionIndex + 1,
-                repromptText = "Question " + questionIndexForSpeech.toString() + ". " + spokenQuestion + " ";
-            for (var i = 0; i < ANSWER_COUNT; i++) {
-                repromptText += (i+1).toString() + ". " + roundAnswers[i] + ". "
+            var gameQuestions = session.attributes.questions,
+                correctAnswerIndex = parseInt(session.attributes.correctAnswerIndex),
+                currentScore = parseInt(session.attributes.score),
+                currentQuestionIndex = parseInt(session.attributes.currentQuestionIndex),
+                correctAnswerText = session.attributes.correctAnswerText;
+
+            var speechOutputAnalysis = "";
+
+            if (answerSlotValid && parseInt(intent.slots.Answer.value) == correctAnswerIndex) {
+                currentScore++;
+                speechOutputAnalysis = "correct. ";
+            } else {
+                if (!userGaveUp) {
+                    speechOutputAnalysis = "wrong. "
+                }
+                speechOutputAnalysis += "The correct answer is " + correctAnswerIndex + ": " + correctAnswerText + ". ";
             }
-            speechOutput += userGaveUp ? "" : "That answer is ";
-            speechOutput += speechOutputAnalysis + "Your score is " + currentScore.toString() + ". " + repromptText;
+            // if currentQuestionIndex is 4, we've reached 5 questions (zero-indexed) and can exit the game session
+            if (currentQuestionIndex == GAME_LENGTH - 1) {
+                speechOutput = userGaveUp ? "" : "That answer is ";
+                speechOutput += speechOutputAnalysis + "You got " + currentScore.toString() + " out of "
+                    + GAME_LENGTH.toString() + " questions correct. Thank you for playing!";
+                callback(session.attributes,
+                    buildSpeechletResponse(CARD_TITLE, speechOutput, "", true));
+            } else {
+                currentQuestionIndex += 1;
+                var spokenQuestion = Object.keys(questions[gameQuestions[currentQuestionIndex]])[0];
+                // Generate a random index for the correct answer, from 0 to 3
+                correctAnswerIndex = Math.floor(Math.random() * (ANSWER_COUNT));
+                var roundAnswers = populateRoundAnswers(gameQuestions, currentQuestionIndex, correctAnswerIndex),
 
-            sessionAttributes = {
-                "speechOutput": repromptText,
-                "repromptText": repromptText,
-                "currentQuestionIndex": currentQuestionIndex,
-                "correctAnswerIndex": correctAnswerIndex + 1,
-                "questions": gameQuestions,
-                "score": currentScore,
-                "correctAnswerText":
-                    questions[gameQuestions[currentQuestionIndex]][Object.keys(questions[gameQuestions[currentQuestionIndex]])[0]][0]
-            };
-            callback(sessionAttributes,
-                buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+                    questionIndexForSpeech = currentQuestionIndex + 1,
+                    repromptText = "Question " + questionIndexForSpeech.toString() + ". " + spokenQuestion + " ";
+                for (var i = 0; i < ANSWER_COUNT; i++) {
+                    repromptText += (i+1).toString() + ". " + roundAnswers[i] + ". "
+                }
+                speechOutput += userGaveUp ? "" : "That answer is ";
+                speechOutput += speechOutputAnalysis + "Your score is " + currentScore.toString() + ". " + repromptText;
+
+                sessionAttributes = {
+                    "speechOutput": repromptText,
+                    "repromptText": repromptText,
+                    "currentQuestionIndex": currentQuestionIndex,
+                    "correctAnswerIndex": correctAnswerIndex + 1,
+                    "questions": gameQuestions,
+                    "score": currentScore,
+                    "correctAnswerText":
+                        questions[gameQuestions[currentQuestionIndex]][Object.keys(questions[gameQuestions[currentQuestionIndex]])[0]][0]
+                };
+                callback(sessionAttributes,
+                    buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+            }
         }
     }
 }

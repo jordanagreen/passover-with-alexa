@@ -41,6 +41,12 @@
     },
     {
       "intent": "AMAZON.CancelIntent"
+    },
+    {
+      "intent": "FirstPlagueQuestionIntent"
+    },
+    {
+      "intent": "MosesAgeQuestionIntent"
     }
   ]
 }
