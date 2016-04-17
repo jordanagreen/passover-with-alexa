@@ -26,6 +26,5 @@ BitterHerbsEatingQuestionIntent why do we eat bitter herbs
 AfterKadeshQuestionIntent what comes after Kadesh
 DarknessLengthQuestionIntent how long did the plague of darkness last
 MatzahEatingQuestionIntent why do we eat matzah
-
-
-
+HowManyCupsQuestionIntent how many cups of wine do we need to drink
+HowManyYearsSlaveryQuestionIntent how many years were the jews slaves for

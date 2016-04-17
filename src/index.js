@@ -34,8 +34,7 @@ var questions = {
                     "Frogs",
                     "Lice",
                     "Darkness"
-                ]}
-    ,
+                ]},
     
         "FourthQuestionQuestionIntent": {
             "Question": "What is the fourth question?",
@@ -45,8 +44,7 @@ var questions = {
                     "Why do we eat bitter herbs?",
                     "Why do we eat matzah?",
                     "Why are we all here?"
-                    ]}
-    ,
+                    ]},
     
         "MosesAgeQuestionIntent": {
             "Question": "How old was Moses when the plagues started?",
@@ -58,8 +56,7 @@ var questions = {
                     "One hundred",
                     "Fifty two",
                     "Sixteen"
-                ]}
-    ,
+                ]},
     
         "BitterHerbsEatingQuestionIntent": {
             "Question": "Why do we eat bitter herbs?",
@@ -68,8 +65,7 @@ var questions = {
                     "Because they taste good",
                     "Because we can",
                     "Because they're good for you"
-                ]}
-    ,
+                ]},
     
         "AfterKadeshQuestionIntent": {
             "Question": "What comes after Kadesh?",
@@ -78,8 +74,7 @@ var questions = {
                     "Karpas",
                     "Hallel",
                     "Maggid"
-                ]}
-    ,
+                ]},
     
         "DarknessLengthQuestionIntent": {
             "Question": "How long did the plague of darkness last?",
@@ -88,8 +83,7 @@ var questions = {
                     "A day",
                     "A year",
                     "An hour"
-                ]}
-    ,
+                ]},
     
         "MatzahEatingQuestionIntent": {
             "Question": "Why do we eat matzah?",
@@ -97,7 +91,27 @@ var questions = {
                     "To remember how the Jews left Egypt so fast the bread didn't have time to rise",
                     "Because it's good for you",
                     "Because we're on a diet",
-                    "Because we're watching our carbs"]}
+                    "Because we're watching our carbs"]},
+        "HowManyCupsQuestionIntent": {
+            "Question": "How many cups of wine do we need to drink?",
+            "Answers": [
+                "Five",
+                "Four",
+                "Two",
+                "One",
+                "Zero",
+                "As many as you can"]
+        },
+        "HowManyYearsSlaveryQuestionIntent": {
+            "Question": "How many years were the Jews slaves for?",
+            "Answers": [
+                "Two hundred and forty",
+                "Two hundred and fifty",
+                "Four hundred",
+                "One hundred",
+                "Five hundred",
+                "One thousand"]
+        }
     
 
 };
@@ -204,12 +218,12 @@ function onIntent(intentRequest, session, callback) {
     } else if ("AMAZON.CancelIntent" === intentName) {
         handleFinishSessionRequest(intent, session, callback);
     } else if (isQuestion(intentName)) {
-        // var isTrueOrFalse = (Math.random()<.5);
-        // if (isTrueOrFalse){
-            // askTrueOrFalseQuestion(intent, session, callback);
-        // } else {
+        var isTrueOrFalse = (Math.random()<.5);
+        if (isTrueOrFalse){
+            askTrueOrFalseQuestion(intent, session, callback);
+        } else {
             askMultipleChoiceQuestion(intent, session, callback);
-        // }
+        }
     } 
 
 
@@ -383,7 +397,7 @@ function onSessionEnded(sessionEndedRequest, session) {
 
 function getWelcomeResponse(callback) {
     var sessionAttributes = {},
-        speechOutput = "Welcome to the seder. Ask me a question.",
+        speechOutput = "Welcome to the say durr. Ask me a question.",
         repromptText = speechOutput,
         shouldEndSession = false;
 
