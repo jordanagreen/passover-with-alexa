@@ -19,67 +19,86 @@
  * When editing your questions pay attention to your punctuation. Make sure you use question marks or periods.
  * Make sure the first answer is the correct one. Set at least 4 answers, any extras will be shuffled in.
  */
-var questions = [
-    {
-        "What was the first plague?": [
-            "Blood",
-            "Frogs",
-            "Lice",
-            "Darkness"
-        ]
-    },
-    {
-        "What is the fourth question?": [
-            "Why do we lean?",
-            "Why do we dip twice?",
-            "Why do we eat bitter herbs?",
-            "Why do we eat matzah?",
-            "Why are we all here?"
-            ]
-    },
-    {
-        "How old was Moses when the plagues started?": [
-            "Eighty",
-            "Forty",
-            "Thirteen",
-            "A hundred",
-            "Fifty two",
-            "Sixteen"
-        ]
-    },
-    {
-        "Why do we eat bitter herbs?": [
-            "To remember the bitter work of slavery",
-            "Because they taste good",
-            "Because we can",
-            "Because they're good for you"
-        ]
-    },
-    {
-        "What comes after Kadesh?": [
-            "Urchatz",
-            "Karpas",
-            "Hallel",
-            "Maggid"
-        ]
-    },
-    {
-        "How long did the plague of darkness last?": [
-            "A week",
-            "A day",
-            "A year",
-            "An hour"
-        ]
-    },
-    {
-        "Why do we eat matzah?": [
-            "To remember how the Jews left Egypt so fast the bread didn't have time to rise",
-            "Because it's good for you",
-            "Because we're on a diet",
-            "Because we're watching our carbs"]
-    }
 
-];
+
+
+
+var questions = {
+    
+        "FirstPlagueQuestionIntent": {
+            "Question": "What was the first plague?",
+            "Answers": [
+                    "Blood",
+                    "Frogs",
+                    "Lice",
+                    "Darkness"
+                ]}
+    ,
+    
+        "FourthQuestionQuestionIntent": {
+            "Question": "What is the fourth question?",
+            "Answers": [
+                    "Why do we lean?",
+                    "Why do we dip twice?",
+                    "Why do we eat bitter herbs?",
+                    "Why do we eat matzah?",
+                    "Why are we all here?"
+                    ]}
+    ,
+    
+        "MosesAgeQuestionIntent": {
+            "Question": "How old was Moses when the plagues started?",
+            "Answers": [
+                    "Seventy Nine",
+                    "Eighty",
+                    "Forty",
+                    "Thirteen",
+                    "One hundred",
+                    "Fifty two",
+                    "Sixteen"
+                ]}
+    ,
+    
+        "BitterHerbsEatingQuestionIntent": {
+            "Question": "Why do we eat bitter herbs?",
+            "Answers": [
+                    "To remember the bitter work of slavery",
+                    "Because they taste good",
+                    "Because we can",
+                    "Because they're good for you"
+                ]}
+    ,
+    
+        "AfterKadeshQuestionIntent": {
+            "Question": "What comes after Kadesh?",
+            "Answers": [
+                    "Urchatz",
+                    "Karpas",
+                    "Hallel",
+                    "Maggid"
+                ]}
+    ,
+    
+        "DarknessLengthQuestionIntent": {
+            "Question": "How long did the plague of darkness last?",
+            "Answers": [
+                    "A week",
+                    "A day",
+                    "A year",
+                    "An hour"
+                ]}
+    ,
+    
+        "MatzahEatingQuestionIntent": {
+            "Question": "Why do we eat matzah?",
+            "Answers": [
+                    "To remember how the Jews left Egypt so fast the bread didn't have time to rise",
+                    "Because it's good for you",
+                    "Because we're on a diet",
+                    "Because we're watching our carbs"]}
+    
+
+};
 
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
@@ -182,9 +201,9 @@ function onIntent(intentRequest, session, callback) {
         handleFinishSessionRequest(intent, session, callback);
     } else if ("AMAZON.CancelIntent" === intentName) {
         handleFinishSessionRequest(intent, session, callback);
-    } else if ("FirstPlagueQuestionIntent" === intentName) {
-        askFirstPlagueQuestion(intent, session, callback);
-    }
+    } else if (isQuestion(intentName)) {
+        askTrueOrFalseQuestion(intent, session, callback);
+    } 
 
 
     else {
@@ -192,27 +211,81 @@ function onIntent(intentRequest, session, callback) {
     }
 }
 
-function askFirstPlagueQuestion(intent, session, callback){
+// var QUESTION_INTENTS = ["FirstPlagueQuestionIntent",
+//                         "MosesAgeQuestionIntent",
+//                         "DarknessLengthQuestionIntent",
+//                         "MatzahEatingQuestionIntent",
+//                         "BitterHerbsEatingQuestionIntent",
+//                         "FourthQuestionQuestionIntent"];
+
+function isQuestion(intentName){
+    for (var k in questions){
+        if (k === intentName) return true;
+    }
+    return false;
+}
+
+
+// function askTrueOrFalseQuestion(intent, session, callback){
+//     var question;
+//     if (intent.name === "FirstPlagueQuestionIntent"){
+//         question = "What was the first plague?";
+//     }
+//     else if (intent.name === "MosesAgeQuestionIntent"){
+//         question = "How old was Moses when the plagues started?";
+//     }
+
+//     var answers = Object.keys(questions[question])[0];
+
+//     var speechOutput = "";
+//     var answer,
+//         answerIndex;
+//     var isCorrect = (Math.random()<.5);
+//     if (isCorrect){
+//         answerIndex = 0;
+//     } 
+//     else {
+//         answerIndex = Math.floor(Math.random() * (answers.length-1)+1);
+//     }
+//     answer = answers[answerIndex];
+//     speechOutput += "I think it's " + answer + ". Is that right?";
+//     var sessionAttributes = {
+//         "speechOutput": speechOutput,
+//         "repromptText": speechOutput,
+//         "isTrueOrFalse": isTrueOrFalse,
+//         "isCorrect": isCorrect,
+//         "correctAnswerText": answers[0],
+//         "questions": questions // to stop it from thinking the game restarted
+//     };
+
+//     var repromptText = speechOutput;
+
+//     callback(sessionAttributes,
+//         buildSpeechletResponse(CARD_TITLE, speechOutput, repromptText, false));
+// }
+
+function askTrueOrFalseQuestion(intent, session, callback){
+
+    // var question;
+    // if (intent.name === "FirstPlagueQuestionIntent"){
+    //     question = "What was the first plague?";
+    // }
+    // else if (intent.name === "MosesAgeQuestionIntent"){
+    //     question = "How old was Moses when the plagues started?";
+    // }
+
+    // var question = "What was the first plague?";
+
     var speechOutput = "",
         sessionAttributes = {};
-    var questionIndex = 0;
-    // var question = Object.keys(questions[questionIndex])[0];
-
-    // var question = {
-    //     "What was the first plague?": [
+    // var questionIndex = 0;
+    // var answers = [
     //         "Blood",
     //         "Frogs",
     //         "Lice",
     //         "Darkness"
-    //     ]
-    // };
-
-    var answers = [
-            "Blood",
-            "Frogs",
-            "Lice",
-            "Darkness"
-        ];
+    //     ];
+    var answers = questions[intent.name]["Answers"];
 
     var answer,
         answerIndex;
@@ -231,7 +304,7 @@ function askFirstPlagueQuestion(intent, session, callback){
         answer = answers[answerIndex];
         speechOutput += "I think it's " + answer + ". Is that right?";
     }
-    sessionAttributes = {
+    var sessionAttributes = {
         "speechOutput": speechOutput,
         "repromptText": speechOutput,
         "isTrueOrFalse": isTrueOrFalse,
@@ -277,7 +350,7 @@ var CARD_TITLE = "Passover Trivia"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
     var sessionAttributes = {},
-        speechOutput = "Ask me a question.",
+        speechOutput = "Welcome to the seder. Ask me a question.",
         repromptText = speechOutput,
         shouldEndSession = false;
 

@@ -20,3 +20,12 @@ DontKnowIntent dunno
 
 FirstPlagueQuestionIntent what was the first plague
 MosesAgeQuestionIntent how old was moses when the plagues started
+DarknessLengthQuestionIntent how long did the plague of darkness last
+FourthQuestionQuestionIntent what is the fourth question
+BitterHerbsEatingQuestionIntent why do we eat bitter herbs
+AfterKadeshQuestionIntent what comes after Kadesh
+DarknessLengthQuestionIntent how long did the plague of darkness last
+MatzahEatingQuestionIntent why do we eat matzah
+
+
+

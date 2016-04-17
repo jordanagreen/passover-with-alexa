@@ -47,6 +47,21 @@
     },
     {
       "intent": "MosesAgeQuestionIntent"
+    },
+    {
+      "intent": "FourthQuestionQuestionIntent"
+    },
+    {
+      "intent": "BitterHerbsEatingQuestionIntent"
+    },
+    {
+      "intent": "AfterKadeshQuestionIntent"
+    },
+    {
+      "intent": "DarknessLengthQuestionIntent"
+    },
+    {
+      "intent": "MatzahEatingQuestionIntent"
     }
   ]
 }
